@@ -1,7 +1,5 @@
 from pythainlp.tag import pos_tag
-from pythainlp.tag import NER
 from pythainlp.tokenize import (
-    sent_tokenize,
     word_tokenize,
     DEFAULT_SENT_TOKENIZE_ENGINE,
     DEFAULT_WORD_TOKENIZE_ENGINE
@@ -63,6 +61,7 @@ class PyThaiNLP:
         self.on_tokenize = tokenize
         self.pos_corpus = pos_corpus
         if self.on_ner:
+            from pythainlp.tag import NER
             self.ner = NER(engine=DEFAULT_NER)
 
     def __call__(self, doc:Doc):
@@ -96,6 +95,7 @@ class PyThaiNLP:
         return doc
 
     def _sent(self, doc:Doc):
+        from pythainlp.tokenize import sent_tokenize
         _text = sent_tokenize(str(doc.text), engine=self.sent_engine)
         _doc = word_tokenize('SplitThword'.join(_text), engine=self.tokenize_engine)
         number_skip = 0

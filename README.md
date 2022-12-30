@@ -5,7 +5,7 @@ Work in processing...
 
 ## Install
 
-> pip install https://github.com/PyThaiNLP/spaCy-PyThaiNLP/archive/refs/heads/main.zip
+> pip install spacy-pythainlp
 
 ## How to use
 
