@@ -11,12 +11,12 @@ Work in processing...
 
 ```python
 import spacy
-from spacy_pythainlp.sents import *
+from spacy_pythainlp.core import *
 
 nlp = spacy.blank("th")
 # Segment the Doc into sentences
 nlp.add_pipe(
-   "th_sents", 
+   "pythainlp", 
 )
 
 data=nlp("ผมเป็นคนไทย   แต่มะลิอยากไปโรงเรียนส่วนผมจะไปไหน  ผมอยากไปเที่ยว")
