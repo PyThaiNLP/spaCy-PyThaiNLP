@@ -11,7 +11,7 @@ Work in processing...
 
 ```python
 import spacy
-from spacy_pythainlp import *
+from spacy_pythainlp.sents import *
 
 nlp = spacy.blank("th")
 # Segment the Doc into sentences
