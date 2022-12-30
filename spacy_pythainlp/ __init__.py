@@ -1,1 +1,1 @@
-from .sents import ThaiSents
+from .core import *
