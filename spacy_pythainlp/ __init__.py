@@ -1,1 +1,1 @@
-from .core import *
+from spacy_pythainlp.core import *
