@@ -1,4 +1,5 @@
 from pythainlp.tag import pos_tag
+
 from pythainlp.tokenize import (
     word_tokenize,
     DEFAULT_SENT_TOKENIZE_ENGINE,
@@ -83,30 +84,49 @@ class PyThaiNLP:
     def _pos(self,doc:Doc):
         _pos_tag = []
         if doc.is_sentenced:
-            _list_txt = [i.text for i in list(doc.sents)]
+            _list_txt = [[j.text for j in i] for i in list(doc.sents)]
         else:
-            _list_txt = [doc.text]
+            _list_txt = [[j.text for j in doc]]
         for i in _list_txt:
-            _w = word_tokenize(i, engine=self.tokenize_engine)
+            _w = i
             _tag_ = pos_tag(_w, engine=self.pos_engine,corpus=self.pos_corpus)
             _pos_tag.extend([tag for _,tag in _tag_])
         for i,_ in enumerate(_pos_tag):
+            #print(doc[i])
             doc[i].pos_ = _pos_tag[i]
         return doc
 
     def _sent(self, doc:Doc):
         from pythainlp.tokenize import sent_tokenize
         _text = sent_tokenize(str(doc.text), engine=self.sent_engine)
-        _doc = word_tokenize('SplitThword'.join(_text), engine=self.tokenize_engine)
+        _doc = word_tokenize('SPLIT'.join(_text), engine=self.tokenize_engine)
+        #print(_doc)
         number_skip = 0
         seen_break = False
+        _new_cut = []
         for i,word in enumerate(_doc):
-            if i == 0:
+            if 'SPLIT' in word:
+                if word.startswith("SPLIT"):
+                    _new_cut.append("SPLIT")
+                    _new_cut.append(word.replace('SPLIT',''))
+                elif word.endswith("SPLIT"):
+                    _new_cut.append(word.replace('SPLIT',''))
+                    _new_cut.append("SPLIT")
+                else:
+                    _new_cut.append(word)
+            else:
+                _new_cut.append(word)
+        #print(_new_cut)
+        for i,word in enumerate(_new_cut):
+            #print(str(i),str(word))
+            if i-number_skip == len(doc) -1:
+                break
+            elif i == 0:
                 doc[i-number_skip].is_sent_start = True
             elif seen_break:
                 doc[i-number_skip].is_sent_start = True
                 seen_break = False
-            elif word == 'SplitThword':
+            elif 'SPLIT' in word:
                 seen_break = True
                 number_skip += 1
             else:
