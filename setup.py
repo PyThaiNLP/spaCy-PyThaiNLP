@@ -10,7 +10,7 @@ with open("README.md", "r") as f:
 
 
 setup(
-    name="spacy-pythainlp",
+    name="spacy_pythainlp",
     version="0.1dev0",
     description="PyThaiNLP For spaCy",
     long_description=readme,
