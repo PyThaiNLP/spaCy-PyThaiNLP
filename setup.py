@@ -18,7 +18,10 @@ setup(
     author="Wannaphong Phatthiyaphaibun",
     author_email="wannaphong@yahoo.com",
     url="https://github.com/PyThaiNLP/spaCy-PyThaiNLP",
-    packages=find_packages(exclude=["tests", "tests.*"]),
+    packages=[
+        "spacy_pythainlp",
+        "spacy_pythainlp.core"
+    ],
     # test_suite="tests",
     python_requires=">=3.7",
     include_package_data=True,
