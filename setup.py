@@ -11,14 +11,14 @@ with open("README.md", "r") as f:
 
 setup(
     name="spacy-pythainlp",
-    version="0.1dev1",
+    version="0.1dev2",
     description="PyThaiNLP For spaCy",
     long_description=readme,
     long_description_content_type="text/markdown",
     author="Wannaphong Phatthiyaphaibun",
     author_email="wannaphong@yahoo.com",
     url="https://github.com/PyThaiNLP/spaCy-PyThaiNLP",
-    packages=find_packages(exclude=["tests", "tests.*"]),
+    packages=["spacy_pythainlp"],
     # test_suite="tests",
     python_requires=">=3.7",
     include_package_data=True,
