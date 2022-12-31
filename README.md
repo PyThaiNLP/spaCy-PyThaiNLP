@@ -47,7 +47,7 @@ nlp.add_pipe(
 - tokenize: Bool (True or False) to change the word tokenize. (the default spaCy is newmm of PyThaiNLP)
 - tokenize_engine: The tokenize engine. You can read more: [Options for engine](https://pythainlp.github.io/dev-docs/api/tokenize.html#pythainlp.tokenize.word_tokenize)
 - sent: Bool (True or False) to turn on the sentence tokenizer.
-- sent_engine: The sentence tokenizer engine. You can read more: [Options for engine](hhttps://pythainlp.github.io/dev-docs/api/tokenize.html#pythainlp.tokenize.sent_tokenize)
+- sent_engine: The sentence tokenizer engine. You can read more: [Options for engine](https://pythainlp.github.io/dev-docs/api/tokenize.html#pythainlp.tokenize.sent_tokenize)
 - pos:  Bool (True or False) to turn on the part-of-speech.
 - pos_engine: The part-of-speech engine. You can read more: [Options for engine](https://pythainlp.github.io/dev-docs/api/tag.html#pythainlp.tag.pos_tag)
 - ner: Bool (True or False) to turn on the NER.
