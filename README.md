@@ -1,6 +1,12 @@
 # spaCy-PyThaiNLP
 This package wraps the PyThaiNLP library to add support Thai for spaCy.
 
+**Support List**
+- word segmentation
+- part-of-speech
+- named entity recognition
+- sentence segmentation
+
 Work in processing...
 
 ## Install
