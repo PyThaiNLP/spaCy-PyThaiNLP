@@ -1,5 +1,5 @@
 # spaCy-PyThaiNLP
-PyThaiNLP For spaCy
+This package wraps the PyThaiNLP library to add support Thai for spaCy.
 
 Work in processing...
 
