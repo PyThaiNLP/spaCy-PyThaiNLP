@@ -11,7 +11,7 @@ from spacy.tokens import Doc, Span
 
 DEFAULT_SENT_ENGINE = DEFAULT_SENT_TOKENIZE_ENGINE
 DEFAULT_POS_ENGINE = "perceptron"
-DEFAULT_NER = "thainer"
+DEFAULT_NER_ENGINE = "thainer"
 
 
 @Language.factory(
@@ -23,7 +23,7 @@ DEFAULT_NER = "thainer"
         "pos_corpus": "orchid_ud",
         "sent_engine": DEFAULT_SENT_ENGINE,
         "sent": True,
-        "ner_engine": DEFAULT_NER,
+        "ner_engine": DEFAULT_NER_ENGINE,
         "ner": True,
         "tokenize_engine": DEFAULT_WORD_TOKENIZE_ENGINE,
         "tokenize": False,
@@ -63,7 +63,7 @@ class PyThaiNLP:
         self.pos_corpus = pos_corpus
         if self.on_ner:
             from pythainlp.tag import NER
-            self.ner = NER(engine=DEFAULT_NER)
+            self.ner = NER(engine=self.ner_engine)
 
     def __call__(self, doc:Doc):
         if self.on_tokenize:
@@ -139,13 +139,18 @@ class PyThaiNLP:
 
     def _ner(self, doc:Doc):
         _ner_ = self.ner.tag(doc.text, pos=False)
+        #print(_ner_)
         _new_ner = []
         c=0
         _t=""
         for i,(w, tag) in enumerate(_ner_):
             len_w = len(w)
-            if i == len(_ner_) -1 and _t != "":
+            #print(str(i),str(w),str(tag))
+            if i+1 == len(_ner_) and _t != "":
                 _new_ner[-1][1] = c+len_w
+            elif i+1 == len(_ner_) and tag.startswith("B-"):
+                _t =  tag.replace("B-","")
+                _new_ner.append([c,c+len_w,_t])
             elif tag.startswith("B-") and _t=="":
                 _t = tag.replace("B-","")
                 _new_ner.append([c,None,_t])
@@ -158,6 +163,7 @@ class PyThaiNLP:
                 _t=""
             c+=len_w
         _ents = []
+        #print(_new_ner)
         for start, end, label in _new_ner:
             span = doc.char_span(start, end, label=label, alignment_mode="contract")
             if span is None:
