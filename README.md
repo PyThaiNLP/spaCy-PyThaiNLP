@@ -65,7 +65,7 @@ nlp.add_pipe(
 - dependency_parsing_engine: The Dependency parsing engine. You can read more: [Options for engine](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
 - dependency_parsing_model: The Dependency parsing model. You can read more: [Options for model](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
 
-**Note: If you u turn on Dependency parsing, word segmentation and sentence segmentation are turn off to use word segmentation and sentence segmentation from Dependency parsing.**
+**Note: If you turn on Dependency parsing, word segmentation and sentence segmentation are turn off to use word segmentation and sentence segmentation from Dependency parsing.**
 
 ## License
 
