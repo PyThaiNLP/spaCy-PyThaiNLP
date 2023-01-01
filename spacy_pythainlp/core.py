@@ -27,6 +27,9 @@ DEFAULT_NER_ENGINE = "thainer"
         "ner": True,
         "tokenize_engine": DEFAULT_WORD_TOKENIZE_ENGINE,
         "tokenize": False,
+        "dependency_parsing": False,
+        "dependency_parsing_engine": "esupar",
+        "dependency_parsing_model": None,
     },
 )
 class PyThaiNLP:
@@ -42,10 +45,13 @@ class PyThaiNLP:
         pos_engine,
         sent_engine,
         ner_engine,
+        dependency_parsing_engine,
         tokenize,
         pos,
         sent,
         ner,
+        dependency_parsing,
+        dependency_parsing_model,
         pos_corpus
     ):
         """
@@ -61,11 +67,18 @@ class PyThaiNLP:
         self.on_sent = sent
         self.on_tokenize = tokenize
         self.pos_corpus = pos_corpus
+        self.dependency_parsing = dependency_parsing
+        self.dependency_parsing_engine = dependency_parsing_engine
+        self.dependency_parsing_model = dependency_parsing_model
         if self.on_ner:
             from pythainlp.tag import NER
             self.ner = NER(engine=self.ner_engine)
 
     def __call__(self, doc:Doc):
+        if self.dependency_parsing:
+            doc = self._dep(doc)
+            self.on_tokenize = False
+            self.on_sent = False
         if self.on_tokenize:
             doc = self._tokenize(doc)
         if self.on_sent:
@@ -76,12 +89,12 @@ class PyThaiNLP:
             doc = self._ner(doc)
         return doc
     
-    def _tokenize(self,doc:Doc):
+    def _tokenize(self, doc:Doc):
         words = list(word_tokenize(doc.text, engine=self.tokenize_engine))
         spaces = [i.isspace() for i in words]
         return Doc(self.nlp.vocab, words=words, spaces=spaces)
 
-    def _pos(self,doc:Doc):
+    def _pos(self, doc:Doc):
         _pos_tag = []
         if doc.is_sentenced:
             _list_txt = [[j.text for j in i] for i in list(doc.sents)]
@@ -134,11 +147,40 @@ class PyThaiNLP:
         return doc
 
     def _dep(self, doc:Doc):
-        # TODO
-        pass
+        from pythainlp.parse import dependency_parsing
+        text = str(doc.text)
+        words = []
+        spaces = []
+        pos = []
+        tags = []
+        morphs = []
+        deps = []
+        heads = []
+        lemmas = []
+        offset = 0
+        _dep_temp = dependency_parsing(text,model=self.dependency_parsing_model, engine=self.dependency_parsing_engine, tag="list")
+        for i in _dep_temp:
+            idx,word,_,postag,_,_,head,dep,_,space =  i
+            words.append(word)
+            pos.append(postag)
+            heads.append(int(head))
+            deps.append(dep)
+            if space=='_':
+                spaces.append(True)
+            else:
+                spaces.append(False)
+        return Doc(self.nlp.vocab, words=words, spaces=spaces,pos=pos,deps=deps,heads=heads)
+
 
     def _ner(self, doc:Doc):
-        _ner_ = self.ner.tag(doc.text, pos=False)
+        _list_txt = []
+        if doc.is_sentenced:
+            _list_txt = [i.text for i in list(doc.sents)]
+        else:
+            _list_txt = [j.text for j in doc]
+        _ner_ =[]
+        for i in _list_txt:
+            _ner_.extend(self.ner.tag(i, pos=False))
         #print(_ner_)
         _new_ner = []
         c=0
@@ -173,3 +215,15 @@ class PyThaiNLP:
 
         doc.ents = _ents
         return doc
+
+    def to_bytes(self, **kwargs):
+        return b""
+
+    def from_bytes(self, _bytes_data, **kwargs):
+        return self
+
+    def to_disk(self, _path, **kwargs):
+        return None
+
+    def from_disk(self, _path, **kwargs):
+        return self

@@ -2,12 +2,12 @@
 This package wraps the PyThaiNLP library to add support Thai for spaCy.
 
 **Support List**
-- word segmentation
-- part-of-speech
-- named entity recognition
-- sentence segmentation
+- Word segmentation
+- Part-of-speech
+- Named entity recognition
+- Sentence segmentation
+- Dependency parsing
 
-Work in processing...
 
 ## Install
 
@@ -46,6 +46,9 @@ nlp.add_pipe(
         "ner": True,
         "tokenize_engine": "newmm",
         "tokenize": False,
+        "dependency_parsing": False,
+        "dependency_parsing_engine": "esupar",
+        "dependency_parsing_model": None,
     }
 )
 ```
@@ -58,7 +61,11 @@ nlp.add_pipe(
 - pos_engine: The part-of-speech engine. You can read more: [Options for engine](https://pythainlp.github.io/docs/3.1/api/tag.html#pythainlp.tag.pos_tag)
 - ner: Bool (True or False) to turn on the NER.
 - ner_engine: The NER engine. You can read more: [Options for engine](https://pythainlp.github.io/docs/3.1/api/tag.html#pythainlp.tag.NER)
+- dependency_parsing: Bool (True or False) to turn on the Dependency parsing.
+- dependency_parsing_engine: The Dependency parsing engine. You can read more: [Options for engine](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
+- dependency_parsing_model: The Dependency parsing model. You can read more: [Options for model](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
 
+**Note: If you u turn on Dependency parsing, word segmentation and sentence segmentation are turn off to use word segmentation and sentence segmentation from Dependency parsing.**
 
 ## License
 
