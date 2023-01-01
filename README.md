@@ -7,6 +7,7 @@ This package wraps the PyThaiNLP library to add support Thai for spaCy.
 - Named entity recognition
 - Sentence segmentation
 - Dependency parsing
+- Word vector
 
 
 ## Install
@@ -49,6 +50,8 @@ nlp.add_pipe(
         "dependency_parsing": False,
         "dependency_parsing_engine": "esupar",
         "dependency_parsing_model": None,
+        "word_vector": True,
+        "word_vector_model": "thai2fit_wv"
     }
 )
 ```
@@ -64,6 +67,8 @@ nlp.add_pipe(
 - dependency_parsing: Bool (True or False) to turn on the Dependency parsing.
 - dependency_parsing_engine: The Dependency parsing engine. You can read more: [Options for engine](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
 - dependency_parsing_model: The Dependency parsing model. You can read more: [Options for model](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing)
+- word_vector: Bool (True or False) to turn on the word vector.
+- word_vector_model: The word vector model. You can read more: [Options for model](https://pythainlp.github.io/docs/3.1/api/word_vector.html#pythainlp.word_vector.WordVector)
 
 **Note: If you turn on Dependency parsing, word segmentation and sentence segmentation are turn off to use word segmentation and sentence segmentation from Dependency parsing.**
 

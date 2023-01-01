@@ -30,6 +30,8 @@ DEFAULT_NER_ENGINE = "thainer"
         "dependency_parsing": False,
         "dependency_parsing_engine": "esupar",
         "dependency_parsing_model": None,
+        "word_vector": True,
+        "word_vector_model": "thai2fit_wv"
     },
 )
 class PyThaiNLP:
@@ -51,13 +53,19 @@ class PyThaiNLP:
         sent,
         ner,
         dependency_parsing,
+        word_vector,
         dependency_parsing_model,
+        word_vector_model,
         pos_corpus
     ):
         """
         Initialize
         """
         self.nlp = nlp
+        self.word_vector = word_vector
+        self.word_vector_model = word_vector_model
+        if self.word_vector:
+            self._vec()
         self.pos_engine = pos_engine
         self.sent_engine = sent_engine
         self.ner_engine = ner_engine
@@ -215,6 +223,14 @@ class PyThaiNLP:
 
         doc.ents = _ents
         return doc
+    
+    def _vec(self):
+        from pythainlp.word_vector import WordVector
+        _wv = WordVector(model_name=self.word_vector_model)
+        self.nlp.vocab.reset_vectors(width=_wv.model["แมว"].shape[0])
+        _temp = list(dict(_wv.model.key_to_index).keys())
+        for i in _temp:
+            self.nlp.vocab[i].vector = _wv.model[i]
 
     def to_bytes(self, **kwargs):
         return b""
