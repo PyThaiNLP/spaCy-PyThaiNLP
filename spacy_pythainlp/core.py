@@ -109,11 +109,10 @@ class PyThaiNLP:
         else:
             _list_txt = [[j.text for j in doc]]
         for i in _list_txt:
-            _w = i
-            _tag_ = pos_tag(_w, engine=self.pos_engine,corpus=self.pos_corpus)
+            _word = i
+            _tag_ = pos_tag(_word, engine=self.pos_engine, corpus=self.pos_corpus)
             _pos_tag.extend([tag for _,tag in _tag_])
         for i,_ in enumerate(_pos_tag):
-            #print(doc[i])
             doc[i].pos_ = _pos_tag[i]
         return doc
 
@@ -121,11 +120,10 @@ class PyThaiNLP:
         from pythainlp.tokenize import sent_tokenize
         _text = sent_tokenize(str(doc.text), engine=self.sent_engine)
         _doc = word_tokenize('SPLIT'.join(_text), engine=self.tokenize_engine)
-        #print(_doc)
         number_skip = 0
         seen_break = False
         _new_cut = []
-        for i,word in enumerate(_doc):
+        for i, word in enumerate(_doc):
             if 'SPLIT' in word:
                 if word.startswith("SPLIT"):
                     _new_cut.append("SPLIT")
@@ -137,9 +135,7 @@ class PyThaiNLP:
                     _new_cut.append(word)
             else:
                 _new_cut.append(word)
-        #print(_new_cut)
-        for i,word in enumerate(_new_cut):
-            #print(str(i),str(word))
+        for i, word in enumerate(_new_cut):
             if i-number_skip == len(doc) -1:
                 break
             elif i == 0:
@@ -166,14 +162,14 @@ class PyThaiNLP:
         heads = []
         lemmas = []
         offset = 0
-        _dep_temp = dependency_parsing(text,model=self.dependency_parsing_model, engine=self.dependency_parsing_engine, tag="list")
+        _dep_temp = dependency_parsing(text, model=self.dependency_parsing_model, engine=self.dependency_parsing_engine, tag="list")
         for i in _dep_temp:
-            idx,word,_,postag,_,_,head,dep,_,space =  i
+            idx, word, _, postag, _, _, head, dep, _, space =  i
             words.append(word)
             pos.append(postag)
             heads.append(int(head))
             deps.append(dep)
-            if space=='_':
+            if space == '_':
                 spaces.append(True)
             else:
                 spaces.append(False)
@@ -189,13 +185,11 @@ class PyThaiNLP:
         _ner_ =[]
         for i in _list_txt:
             _ner_.extend(self.ner.tag(i, pos=False))
-        #print(_ner_)
         _new_ner = []
         c=0
         _t=""
         for i,(w, tag) in enumerate(_ner_):
             len_w = len(w)
-            #print(str(i),str(w),str(tag))
             if i+1 == len(_ner_) and _t != "":
                 _new_ner[-1][1] = c+len_w
             elif i+1 == len(_ner_) and tag.startswith("B-"):
@@ -213,7 +207,6 @@ class PyThaiNLP:
                 _t=""
             c+=len_w
         _ents = []
-        #print(_new_ner)
         for start, end, label in _new_ner:
             span = doc.char_span(start, end, label=label, alignment_mode="contract")
             if span is None:
@@ -223,7 +216,7 @@ class PyThaiNLP:
 
         doc.ents = _ents
         return doc
-    
+
     def _vec(self):
         from pythainlp.word_vector import WordVector
         _wv = WordVector(model_name=self.word_vector_model)
