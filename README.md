@@ -20,7 +20,7 @@ This package wraps the PyThaiNLP library to add support Thai for spaCy.
 **Example**
 ```python
 import spacy
-from spacy_pythainlp.core import *
+import spacy_pythainlp.core
 
 nlp = spacy.blank("th")
 # Segment the Doc into sentences
