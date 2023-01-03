@@ -99,7 +99,7 @@ class PyThaiNLP:
     
     def _tokenize(self, doc:Doc):
         words = list(word_tokenize(doc.text, engine=self.tokenize_engine))
-        spaces = [i.isspace() for i in words]
+        spaces = [False for i in words]
         return Doc(self.nlp.vocab, words=words, spaces=spaces)
 
     def _pos(self, doc:Doc):
