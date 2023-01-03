@@ -3,6 +3,7 @@ from setuptools import find_packages, setup
 requirements = [
     "pythainlp>=3.1.0",
     "spacy>=3.0",
+    "gensim>=4.0",
     "python-crfsuite"
 ]
 
@@ -12,7 +13,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="spacy-pythainlp",
-    version="0.1dev6",
+    version="0.1dev7",
     description="PyThaiNLP For spaCy",
     long_description=readme,
     long_description_content_type="text/markdown",
