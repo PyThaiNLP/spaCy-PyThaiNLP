@@ -165,6 +165,9 @@ class PyThaiNLP:
         _dep_temp = dependency_parsing(text, model=self.dependency_parsing_model, engine=self.dependency_parsing_engine, tag="list")
         for i in _dep_temp:
             # Handle variable number of fields returned by dependency_parsing
+            # CoNLL-U format requires at least 10 fields, but some engines may return more
+            if len(i) < 10:
+                raise ValueError(f"Expected at least 10 fields in dependency parsing output, got {len(i)}")
             # Only unpack the first 10 fields we need (CoNLL-U format)
             idx, word, _, postag, _, _, head, dep, _, space = i[:10]
             words.append(word)
