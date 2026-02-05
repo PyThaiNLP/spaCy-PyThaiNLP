@@ -218,7 +218,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 ## License
 
 ```
-   Copyright 2016-2023 PyThaiNLP Project
+   Copyright 2016-2026 PyThaiNLP Project
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
