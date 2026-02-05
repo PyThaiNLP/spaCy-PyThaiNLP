@@ -164,7 +164,9 @@ class PyThaiNLP:
         offset = 0
         _dep_temp = dependency_parsing(text, model=self.dependency_parsing_model, engine=self.dependency_parsing_engine, tag="list")
         for i in _dep_temp:
-            idx, word, _, postag, _, _, head, dep, _, space =  i
+            # Handle variable number of fields returned by dependency_parsing
+            # Only unpack the first 10 fields we need (CoNLL-U format)
+            idx, word, _, postag, _, _, head, dep, _, space = i[:10]
             words.append(word)
             pos.append(postag)
             heads.append(int(head))
