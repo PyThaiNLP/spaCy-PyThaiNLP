@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/spacy-pythainlp.svg)](https://pypi.org/project/spacy-pythainlp/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
 This package wraps the [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) library to add Thai language support for [spaCy](https://spacy.io/).
 
@@ -33,7 +33,7 @@ This package wraps the [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) libra
 
 ### Prerequisites
 
-- Python 3.7 or higher
+- Python 3.9 or higher
 - spaCy 3.0 or higher
 - PyThaiNLP 3.1.0 or higher
 

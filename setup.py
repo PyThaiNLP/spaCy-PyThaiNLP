@@ -21,7 +21,7 @@ setup(
     author_email="wannaphong@yahoo.com",
     url="https://github.com/PyThaiNLP/spaCy-PyThaiNLP",
     packages=["spacy_pythainlp"],
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     include_package_data=True,
     install_requires=requirements,
     license="Apache Software License 2.0",
