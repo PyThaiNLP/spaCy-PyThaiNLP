@@ -8,5 +8,5 @@ segmentation, dependency parsing, and word vectors.
 
 from spacy_pythainlp.core import PyThaiNLP
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __all__ = ["PyThaiNLP"]
