@@ -8,25 +8,29 @@ This package wraps the [PyThaiNLP](https://github.com/PyThaiNLP/pythainlp) libra
 
 ## Features
 
-**Support List**
-- Word segmentation (tokenization)
-- Part-of-speech tagging
-- Named entity recognition (NER)
-- Sentence segmentation
-- Dependency parsing
-- Word vectors
+- **Word Tokenization**: Custom `PyThaiNLPTokenizer` preserving exact whitespace and token offsets, supporting custom dictionaries and engines (`newmm`, `longest`, `attacut`, etc.).
+- **Sentence Segmentation**: Boundary detection preserving token integrity via `PyThaiNLPSentencizer` and engines like `crfcut`, `whitespace`, `thaisum`.
+- **Part-of-Speech Tagging**: Supports Universal Dependencies tags (`token.pos_`) and fine-grained tags (`token.tag_`) across corpora (`orchid_ud`, `pud`, `blackboard_ud`, `tdtb`, `tud`, `orchid`).
+- **Named Entity Recognition**: Flat NER (`token.ents`) and Nested NER (`doc.spans`) via `PyThaiNLPNER`.
+- **Dependency Parsing**: Integration with PyThaiNLP's dependency parsers (`esupar`, etc.).
+- **Word Vectors**: Word vector support via `thai2fit_wv` and other models.
+- **Text Normalization / Lemmatization**: Thai text normalization via `PyThaiNLPLemmatizer`.
+- **Flexible Pipeline Architecture**: Use the one-line `spacy_pythainlp.load()`, the blank model `spacy_pythainlp.blank()`, the all-in-one `pythainlp` pipe, or individual modular components.
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Tokenizer & Custom Dictionaries](#tokenizer--custom-dictionaries)
+- [Modular Components](#modular-components)
 - [Usage Examples](#usage-examples)
-  - [Basic Sentence Segmentation](#basic-sentence-segmentation)
+  - [Sentence Segmentation](#sentence-segmentation)
   - [Part-of-Speech Tagging](#part-of-speech-tagging)
   - [Named Entity Recognition](#named-entity-recognition)
   - [Dependency Parsing](#dependency-parsing)
   - [Word Vectors](#word-vectors)
-- [Configuration](#configuration)
+  - [Lemmatization and Text Normalization](#lemmatization-and-text-normalization)
+- [All-in-One Configuration](#all-in-one-configuration)
 - [License](#license)
 
 ## Installation
@@ -45,75 +49,153 @@ pip install spacy-pythainlp
 
 ## Quick Start
 
+### One-line Pipeline Loader
+
+The easiest way to get started is with `spacy_pythainlp.load()`:
+
 ```python
-import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
-# Create a blank Thai language model
-nlp = spacy.blank("th")
+# Load Thai model with tokenizer, sentence segmentation, POS tagging, and NER
+nlp = spacy_pythainlp.load()
 
-# Add the PyThaiNLP pipeline component
-nlp.add_pipe("pythainlp")
-
-# Process text
 doc = nlp("ผมเป็นคนไทย แต่มะลิอยากไปโรงเรียนส่วนผมจะไปไหน ผมอยากไปเที่ยว")
 
 # Access sentences
 for sent in doc.sents:
-    print(sent)
-# Output:
-# ผมเป็นคนไทย แต่มะลิอยากไปโรงเรียนส่วนผมจะไปไหน
-# ผมอยากไปเที่ยว
+    print(sent.text)
+
+# Access tokens and POS tags
+for token in doc:
+    print(f"{token.text}: {token.pos_} ({token.tag_})")
 ```
 
-## Usage Examples
+### Standard spaCy Pipeline Setup
 
-### Basic Sentence Segmentation
+You can also add the `pythainlp` component to a blank model:
 
 ```python
 import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
 nlp = spacy.blank("th")
 nlp.add_pipe("pythainlp")
 
+doc = nlp("ผมเป็นคนไทย แต่มะลิอยากไปโรงเรียน")
+```
+
+## Tokenizer & Custom Dictionaries
+
+`PyThaiNLPTokenizer` preserves exact whitespace and character offsets, making `doc.text` identical to the input text.
+
+```python
+import spacy
+from spacy_pythainlp import PyThaiNLPTokenizer
+from pythainlp.util import dict_trie
+
+nlp = spacy.blank("th")
+
+# Use a custom dictionary
+custom_words = {"แอนตี้กราวิตี้", "ภาษาไทย"}
+trie = dict_trie(dict_source=custom_words)
+
+nlp.tokenizer = PyThaiNLPTokenizer(nlp.vocab, engine="newmm", custom_dict=trie)
+doc = nlp("แอนตี้กราวิตี้และการประมวลผลภาษาไทย")
+
+print([token.text for token in doc])
+```
+
+You can also create a blank model directly:
+
+```python
+import spacy_pythainlp
+
+nlp = spacy_pythainlp.blank("th", tokenize_engine="newmm")
+doc = nlp("สวัสดีครับ วันนี้อากาศดี")
+```
+
+And in spaCy config files:
+
+```ini
+[nlp]
+lang = "th"
+
+[nlp.tokenizer]
+@tokenizers = "pythainlp_tokenizer"
+engine = "newmm"
+```
+
+## Modular Components
+
+Instead of enabling or disabling features in a single component, you can add individual modular components to any spaCy pipeline:
+
+```python
+import spacy
+import spacy_pythainlp
+
+nlp = spacy_pythainlp.blank("th")
+
+# Add only sentence segmentation
+nlp.add_pipe("pythainlp_sentencizer", config={"engine": "crfcut"})
+
+# Add only POS tagging
+nlp.add_pipe("pythainlp_tagger", config={"corpus": "orchid_ud"})
+
+# Add only NER
+nlp.add_pipe("pythainlp_ner", config={"engine": "thainer"})
+
+# Add only lemmatization / text normalization
+nlp.add_pipe("pythainlp_lemmatizer", config={"normalize_text": True})
+
+doc = nlp("วันที่ 15 กันยายน 2564 ทดสอบระบบที่กรุงเทพ")
+```
+
+Available component factories:
+- `"pythainlp_sentencizer"`: Sentence segmentation
+- `"pythainlp_tagger"`: Part-of-speech tagging
+- `"pythainlp_ner"`: Named entity recognition
+- `"pythainlp_parser"`: Dependency parsing
+- `"pythainlp_vectors"`: Word vectors
+- `"pythainlp_lemmatizer"`: Lemmatization and text normalization
+- `"pythainlp"`: All-in-one component (backward compatible)
+
+## Usage Examples
+
+### Sentence Segmentation
+
+```python
+import spacy_pythainlp
+
+nlp = spacy_pythainlp.load(sent=True, pos=False, ner=False)
+
 doc = nlp("ผมเป็นคนไทย แต่มะลิอยากไปโรงเรียนส่วนผมจะไปไหน ผมอยากไปเที่ยว")
 
-# Get sentences
-sentences = list(doc.sents)
-print(f"Number of sentences: {len(sentences)}")
-for i, sent in enumerate(sentences, 1):
+for i, sent in enumerate(doc.sents, 1):
     print(f"Sentence {i}: {sent.text}")
 ```
 
 ### Part-of-Speech Tagging
 
 ```python
-import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
-nlp = spacy.blank("th")
-nlp.add_pipe("pythainlp", config={"pos": True})
+nlp = spacy_pythainlp.load(pos=True, pos_corpus="orchid_ud")
 
 doc = nlp("ผมเป็นคนไทย")
 
-# Print tokens with POS tags
 for token in doc:
-    print(f"{token.text}: {token.pos_}")
+    print(f"{token.text}: UPOS={token.pos_}, TAG={token.tag_}")
 ```
 
 ### Named Entity Recognition
 
 ```python
-import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
-nlp = spacy.blank("th")
-nlp.add_pipe("pythainlp", config={"ner": True})
+nlp = spacy_pythainlp.load(ner=True, ner_engine="thainer")
 
 doc = nlp("วันที่ 15 กันยายน 2564 ทดสอบระบบที่กรุงเทพ")
 
-# Print named entities
 for ent in doc.ents:
     print(f"{ent.text}: {ent.label_}")
 ```
@@ -121,15 +203,12 @@ for ent in doc.ents:
 ### Dependency Parsing
 
 ```python
-import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
-nlp = spacy.blank("th")
-nlp.add_pipe("pythainlp", config={"dependency_parsing": True})
+nlp = spacy_pythainlp.load(dependency_parsing=True, dependency_parsing_engine="esupar")
 
 doc = nlp("ผมเป็นคนไทย")
 
-# Print dependency relations
 for token in doc:
     print(f"{token.text}: {token.dep_} <- {token.head.text}")
 ```
@@ -137,27 +216,34 @@ for token in doc:
 ### Word Vectors
 
 ```python
-import spacy
-import spacy_pythainlp.core
+import spacy_pythainlp
 
-nlp = spacy.blank("th")
-nlp.add_pipe("pythainlp", config={"word_vector": True, "word_vector_model": "thai2fit_wv"})
+nlp = spacy_pythainlp.load(word_vector=True, word_vector_model="thai2fit_wv")
 
 doc = nlp("แมว สุนัข")
 
-# Access word vectors
-for token in doc:
-    print(f"{token.text}: vector shape = {token.vector.shape}")
-    
-# Calculate similarity
 token1 = doc[0]  # แมว
 token2 = doc[1]  # สุนัข
 print(f"Similarity: {token1.similarity(token2)}")
 ```
 
-## Configuration
+### Lemmatization and Text Normalization
 
-You can customize the PyThaiNLP pipeline component by passing a configuration dictionary to `nlp.add_pipe()`:
+```python
+import spacy
+import spacy_pythainlp
+
+nlp = spacy_pythainlp.blank("th")
+nlp.add_pipe("pythainlp_lemmatizer")
+
+doc = nlp("สระ  เ เ ม ว")
+for token in doc:
+    print(f"{token.text} -> lemma: {token.lemma_}, norm: {token.norm_}")
+```
+
+## All-in-One Configuration
+
+You can customize the `pythainlp` pipeline component with `config`:
 
 ```python
 nlp.add_pipe(
@@ -185,24 +271,20 @@ nlp.add_pipe(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `tokenize` | `bool` | `False` | Enable/disable word tokenization (spaCy uses PyThaiNLP's newmm by default) |
-| `tokenize_engine` | `str` | `"newmm"` | Tokenization engine. [See options](https://pythainlp.github.io/docs/3.1/api/tokenize.html#pythainlp.tokenize.word_tokenize) |
+| `tokenize` | `bool` | `False` | Enable/disable word tokenization in component |
+| `tokenize_engine` | `str` | `"newmm"` | Tokenization engine (`newmm`, `longest`, `attacut`, `deepcut`, etc.) |
 | `sent` | `bool` | `True` | Enable/disable sentence segmentation |
-| `sent_engine` | `str` | `"crfcut"` | Sentence tokenizer engine. [See options](https://pythainlp.github.io/docs/3.1/api/tokenize.html#pythainlp.tokenize.sent_tokenize) |
+| `sent_engine` | `str` | `"crfcut"` | Sentence tokenizer engine (`crfcut`, `whitespace`, `whitespace+newline`, `thaisum`, `tltk`, `wtp`) |
 | `pos` | `bool` | `True` | Enable/disable part-of-speech tagging |
-| `pos_engine` | `str` | `"perceptron"` | POS tagging engine. [See options](https://pythainlp.github.io/docs/3.1/api/tag.html#pythainlp.tag.pos_tag) |
-| `pos_corpus` | `str` | `"orchid_ud"` | Corpus for POS tagging |
+| `pos_engine` | `str` | `"perceptron"` | POS tagging engine (`perceptron`, `unigram`, `tltk`, `wangchanberta`) |
+| `pos_corpus` | `str` | `"orchid_ud"` | Corpus for POS tagging (`orchid_ud`, `pud`, `blackboard_ud`, `tdtb`, `tud`, `orchid`, `blackboard`) |
 | `ner` | `bool` | `True` | Enable/disable named entity recognition |
-| `ner_engine` | `str` | `"thainer"` | NER engine. [See options](https://pythainlp.github.io/docs/3.1/api/tag.html#pythainlp.tag.NER) |
+| `ner_engine` | `str` | `"thainer"` | NER engine (`thainer`, `thainer-v2`, `phayathaibert`, `wangchanberta`, `thai-nner`) |
 | `dependency_parsing` | `bool` | `False` | Enable/disable dependency parsing |
-| `dependency_parsing_engine` | `str` | `"esupar"` | Dependency parsing engine. [See options](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing) |
-| `dependency_parsing_model` | `str` | `None` | Dependency parsing model. [See options](https://pythainlp.github.io/docs/3.1/api/parse.html#pythainlp.parse.dependency_parsing) |
+| `dependency_parsing_engine` | `str` | `"esupar"` | Dependency parsing engine (`esupar`, `spacy_thai`, `transformers_ud`, `ud_goeswith`, `attaparse`) |
+| `dependency_parsing_model` | `str` | `None` | Dependency parsing model |
 | `word_vector` | `bool` | `True` | Enable/disable word vectors |
-| `word_vector_model` | `str` | `"thai2fit_wv"` | Word vector model. [See options](https://pythainlp.github.io/docs/3.1/api/word_vector.html#pythainlp.word_vector.WordVector) |
-
-**Important Notes:**
-- When `dependency_parsing` is enabled, word segmentation and sentence segmentation are automatically disabled to use the tokenization from the dependency parser.
-- All configuration options are optional and have sensible defaults.
+| `word_vector_model` | `str` | `"thai2fit_wv"` | Word vector model (`thai2fit_wv`, etc.) |
 
 ## Resources
 
@@ -213,7 +295,7 @@ nlp.add_pipe(
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
